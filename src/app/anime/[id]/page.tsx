@@ -8,6 +8,7 @@ const Page = async ({ params: { id } }: any) => {
   const anime = await coba(`/anime/${id}`);
   const characters = await coba(`/anime/${id}/characters`);
   const staffs = await coba(`/anime/${id}/staff`);
+  const audioThemes = await coba(`/anime/${id}/themes`);
   const getProducersData = await getProducers(anime);
   const getAllProducersDatas = await getAllProducersData(anime);
   const getAllLicensorsDatas = await getAllLicensorsData(anime);
@@ -142,6 +143,72 @@ const Page = async ({ params: { id } }: any) => {
     );
   };
 
+  const AnimeCharactersAndVoices = () => {
+    return (
+      <div className="p-1 mb-4 grid grid-cols-1 border border-helper rounded-xl text-textDark dark:text-textLight">
+        <p className="font-semibold border-b border-b-helper">Characters & Voice Actros</p>
+        <div className="pt-2 grid lg:grid-cols-2 gap-2 lg:h-full md:h-[310px] sm:h-72 h-72 overflow-auto">
+          <AnimeCharacterAndVoice api={characters}></AnimeCharacterAndVoice>
+        </div>
+      </div>
+    );
+  };
+
+  const AnimeStaffs = () => {
+    return (
+      <div className="p-1 mb-4 grid grid-cols-1 border border-helper rounded-xl text-textDark dark:text-textLight">
+        <p className="font-semibold border-b border-b-helper">Staff</p>
+        <div className="pt-2 grid lg:grid-cols-2 gap-2 lg:h-full md:h-[310px] sm:h-80 h-[355px] overflow-auto">
+          {staffs.data.slice(0, 4).map(
+            (
+              staff: {
+                person: {
+                  name: string;
+                  images: {
+                    jpg: {
+                      image_url: string;
+                    };
+                  };
+                };
+                positions: string[];
+              },
+              index: number
+            ) => (
+              <div key={index} className="md:flex md:justify-between">
+                <div className="flex">
+                  <Image src={staff.person.images.jpg.image_url} alt={`Staff${index}`} width={42} height={65} className="imageCharacters"></Image>
+                  <div className="text-sm px-1">
+                    <p>{staff.person.name}</p>
+                    <p>{staff.positions.join(", ")}</p>
+                  </div>
+                </div>
+              </div>
+            )
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const AnimeAudio = () => {
+    return (
+      <div className="p-1 mb-4 grid grid-cols-2 gap-2 border border-helper rounded-xl text-textDark dark:text-textLight">
+        <div>
+          <p className="font-semibold border-b border-b-helper">Opening Themes</p>
+          {audioThemes.data.openings.map((opening: string, index: number) => (
+            <p key={index}>{opening}</p>
+          ))}
+        </div>
+        <div>
+          <p className="font-semibold border-b border-b-helper">Ending Themes</p>
+          {audioThemes.data.endings.map((ending: string, index: number) => (
+            <p key={index}>{ending}</p>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <main>
       <div className="md:max-w-7xl sm:max-w-2xl max-w-full mx-auto mt-10 border border-helper rounded-xl ">
@@ -156,14 +223,9 @@ const Page = async ({ params: { id } }: any) => {
           <div className="w-full">
             <div className="w-full p-2">{AnimeHeaderDetail()}</div>
             <div className="w-full p-2">{AnimeDescription()}</div>
-            <div className="w-full p-2">
-              <div className="p-1 grid grid-cols-1 border border-helper rounded-xl text-textDark dark:text-textLight">
-                <p className="font-semibold border-b border-b-helper">Characters & Voice Actros</p>
-                <div className="pt-2 md:grid md:grid-cols-2 md:gap-2">
-                  <AnimeCharacterAndVoice api={characters}></AnimeCharacterAndVoice>
-                </div>
-              </div>
-            </div>
+            <div className="w-full p-2">{AnimeCharactersAndVoices()}</div>
+            <div className="w-full p-2">{AnimeStaffs()}</div>
+            <div className="w-full p-2">{AnimeAudio()}</div>
           </div>
         </div>
       </div>
